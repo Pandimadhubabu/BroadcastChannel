@@ -1,0 +1,26 @@
+---
+import { fetchPosts } from '../../utils/telegram'; // You'll create this helper
+import Layout from '../../layouts/Layout.astro';
+import { getEnv } from '../../utils/env'; // For .env reading
+
+const { params } = Astro;
+const channel = params.channel;
+
+const allowedChannels = getEnv('ALLOWED_CHANNELS').split(',');
+
+if (!allowedChannels.includes(channel)) {
+  throw new Error(`Channel "${channel}" not allowed.`);
+}
+
+const posts = await fetchPosts(channel);
+---
+
+<Layout title={`Posts from ${channel}`}>
+  <h1>Posts from @{channel}</h1>
+  {posts.map(post => (
+    <article>
+      <h2>{post.title}</h2>
+      <p innerHTML={post.content}></p>
+    </article>
+  ))}
+</Layout>
